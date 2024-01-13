@@ -33,10 +33,12 @@ def client(app: Flask) -> testing.FlaskClient :
     return app.test_client()
 
 def test_logout_should_check_if_session_is_active():
+  stored_original_method = session_handler.is_authenticated_session
   session_handler.is_authenticated_session = MagicMock()
   sut = logout.logout
   sut()
   session_handler.is_authenticated_session.assert_called_once()
+  session_handler.is_authenticated_session = stored_original_method
 
 
 sut = session_handler.is_authenticated_session
@@ -58,3 +60,9 @@ def test_is_auth_session_should_return_false_if_authenticated_session(client):
      session['id_token'] = 'any valid id_token'
      assert sut(session) is True
 
+
+
+sut2 = session_handler.clear_auth_session
+
+def test_clear_auth_session_is_callable():
+   assert (callable(sut2))

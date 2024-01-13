@@ -6,3 +6,5 @@ def is_authenticated_session(session: SessionMixin) -> bool:
   else:
     return False
   
+def clear_auth_session(session: SessionMixin) -> SessionMixin:
+  ...
