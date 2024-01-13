@@ -67,7 +67,7 @@ sut2 = session_handler.clear_auth_session
 def test_clear_auth_session_is_callable():
    assert (callable(sut2))
 
-def test_clear_auth_session_return_clear_session(client):
+def test_clear_auth_session_calls_session_pop(client):
    with client.session_transaction() as session:
       session.pop = MagicMock()
       session['user'] = 'any user info'
@@ -76,3 +76,11 @@ def test_clear_auth_session_return_clear_session(client):
       session.pop.assert_any_call('user')
       session.pop.assert_any_call('id_token')
       assert session.pop.call_count == 2
+
+def test_clear_auth_session_calls_returns_clear_session(client):
+   with client.session_transaction() as session:
+      session['user'] = 'any user info'
+      session['id_token'] = 'valid id token'
+      response = sut2(session)
+      assert ('user' not in response)
+      assert ('id_token' not in response)
