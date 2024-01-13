@@ -7,4 +7,7 @@ def is_authenticated_session(session: SessionMixin) -> bool:
     return False
   
 def clear_auth_session(session: SessionMixin) -> SessionMixin:
+  session.pop('user')
+  session.pop('id_token')
+  return session
   ...
