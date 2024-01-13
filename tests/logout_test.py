@@ -50,3 +50,8 @@ def test_is_auth_session_should_be_callable():
 def test_is_auth_session_should_return_false_if_no_session(client):
   with client.session_transaction() as session:
      assert sut(session) is False
+
+def test_is_auth_session_should_return_false_if_authenticated_session(client):
+  with client.session_transaction() as session:
+     session['id_token'] = 'any valid id_token'
+     assert sut(session) is True
