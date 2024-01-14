@@ -34,36 +34,97 @@ def client(app: Flask) -> testing.FlaskClient :
     return app.test_client()
 
 def test_logout_should_check_if_session_is_active(client):
+  original_is_authenticated_session = session_handler.is_authenticated_session
+  original_clear_auth_session = session_handler.clear_auth_session
+  original_get_token_hint = session_handler.get_token_hint
   with client.session_transaction() as session:
-    stored_original_method = session_handler.is_authenticated_session
-    session_handler.clear_auth_session = Mock(return_value = '')
-    session_handler.is_authenticated_session = MagicMock()
+    session_handler.is_authenticated_session = MagicMock(return_value = True)
+    session_handler.clear_auth_session = Mock(return_value = session)
+    session_handler.get_token_hint = MagicMock(return_value = 'whatever token hint')
     sut = logout.logout
     sut()
     session_handler.is_authenticated_session.assert_called_once()
-    session_handler.is_authenticated_session = stored_original_method
-
+  
+  session_handler.is_authenticated_session = original_is_authenticated_session
+  session_handler.clear_auth_session = original_clear_auth_session
+  session_handler.get_token_hint = original_get_token_hint
 
 def test_logout_should_clear_auth_session_if_session_is_active(client):
-  session_handler.is_authenticated_session = MagicMock(return_value = True)
-  session_handler.clear_auth_session = Mock(return_value = '')
+  original_is_authenticated_session = session_handler.is_authenticated_session
+  original_clear_auth_session = session_handler.clear_auth_session
+  original_get_token_hint = session_handler.get_token_hint
+
   with client.session_transaction() as session:
+      session_handler.is_authenticated_session = MagicMock(return_value = True)
+      session_handler.clear_auth_session = Mock()
+      session_handler.get_token_hint = MagicMock()
       session['id_token'] = 'any valid id_token'
       session['user'] = 'any valid user object'
       sut = logout.logout
       sut()
       session_handler.clear_auth_session.assert_called_once()
 
+  session_handler.is_authenticated_session = original_is_authenticated_session
+  session_handler.clear_auth_session = original_clear_auth_session
+  session_handler.get_token_hint = original_get_token_hint
 
 def test_logout_should_NOT_clear_auth_session_if_session_is_inactive(client):
+  original_is_authenticated_session = session_handler.is_authenticated_session
+  original_clear_auth_session = session_handler.clear_auth_session
+  original_get_token_hint = session_handler.get_token_hint  
+
   session_handler.is_authenticated_session = MagicMock(return_value = False)
   session_handler.clear_auth_session = Mock(return_value = '')
+  session_handler.get_token_hint = MagicMock(return_value = 'a')
   with client.session_transaction() as session:
       session['id_token'] = 'any valid id_token'
       session['user'] = 'any valid user object'
       sut = logout.logout
       response = sut()
       session_handler.clear_auth_session.assert_not_called()
+  
+  session_handler.is_authenticated_session = original_is_authenticated_session
+  session_handler.clear_auth_session = original_clear_auth_session
+  session_handler.get_token_hint = original_get_token_hint
+
+def test_logout_should_get_token_hint(client):
+  original_is_authenticated_session = session_handler.is_authenticated_session
+  original_clear_auth_session = session_handler.clear_auth_session
+  original_get_token_hint = session_handler.get_token_hint
+
+  with client.session_transaction() as session:
+      local_sut = logout.logout
+      session_handler.is_authenticated_session = MagicMock(return_value = True)
+      session_handler.clear_auth_session = Mock()
+      session_handler.get_token_hint = MagicMock()
+      local_sut()
+      session_handler.get_token_hint.assert_called_once()
+  
+  session_handler.is_authenticated_session = original_is_authenticated_session
+  session_handler.clear_auth_session = original_clear_auth_session
+  session_handler.get_token_hint = original_get_token_hint
+
+
+def test_logout_should_NOT_get_token_hint(client):
+  original_is_authenticated_session = session_handler.is_authenticated_session
+  original_clear_auth_session = session_handler.clear_auth_session
+  original_get_token_hint = session_handler.get_token_hint
+
+  with client.session_transaction() as session:
+     # no id_token
+      session_handler.is_authenticated_session = MagicMock(return_value = False)
+      session_handler.clear_auth_session = Mock()
+      session_handler.get_token_hint = MagicMock()
+
+      local_sut = logout.logout
+      local_sut()
+
+      session_handler.get_token_hint.assert_not_called()
+
+  session_handler.is_authenticated_session = original_is_authenticated_session
+  session_handler.clear_auth_session = original_clear_auth_session
+  session_handler.get_token_hint = original_get_token_hint
+
 
 sut = session_handler.is_authenticated_session
 
@@ -101,6 +162,7 @@ def test_clear_auth_session_calls_session_pop(client):
       session.pop.assert_any_call('user')
       session.pop.assert_any_call('id_token')
       assert session.pop.call_count == 2
+      
 
 def test_clear_auth_session_calls_returns_clear_session(client):
    with client.session_transaction() as session:
@@ -115,16 +177,17 @@ def test_get_token_hint_is_callabe():
    local_sut = session_handler.get_token_hint
    assert callable(local_sut)
 
-def test_get_token_hint_should_return_id_token(client):
+def test_get_token_hint_should_call_session_get(client):
   local_sut = session_handler.get_token_hint
   with client.session_transaction() as session:
     session.get = MagicMock()
     local_sut(session)
     session.get.assert_called_once_with('id_token')
 
-def test_get_token_hint_should_call_session_get(client):
+def test_get_token_hint_should_return_id_token(client):
    local_sut = session_handler.get_token_hint
    with client.session_transaction() as session:
      session['id_token'] = 'any valid id token'
+     print(session.get('id_token'))
      expected = 'any valid id token'
      assert local_sut(session) == expected
