@@ -1,8 +1,20 @@
 from .helpers import session_handler
-from flask import session
+from flask import session, redirect
+from oidc_client.config import END_SESSION_ENDPOINT, POST_LOGOUT_REDIRECT
+from urllib.parse import urlencode
+
 
 
 def logout():
   if session_handler.is_authenticated_session(session):
-    session_handler.get_token_hint(session)
+    token_hint = session_handler.get_token_hint(session)
     session_handler.clear_auth_session(session)
+
+    query_params = {
+      'post_logout_redirect_uri': POST_LOGOUT_REDIRECT,
+      'token_hint': token_hint
+    }
+
+    encoded_qs = urlencode(query_params)
+    full_url = '%s?%s' % (END_SESSION_ENDPOINT, encoded_qs)
+    return redirect(full_url)

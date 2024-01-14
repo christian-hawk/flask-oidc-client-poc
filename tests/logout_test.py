@@ -1,9 +1,11 @@
-from oidc_client import logout, create_app
+from oidc_client import logout, create_app, config
 from oidc_client.helpers import session_handler
 import pytest
-from flask import Flask, testing
+from flask import Flask, testing, url_for, redirect
 from unittest.mock import MagicMock, Mock
 from oidc_client.logout import session as client_session
+from urllib.parse import urlencode
+
 
   # Check if session is active (Credential exists)
   # saves id_token as token_hint
@@ -126,6 +128,32 @@ def test_logout_should_NOT_get_token_hint(client):
   session_handler.get_token_hint = original_get_token_hint
 
 
+def test_logout_calls_redirect(client):
+  original_is_authenticated_session = session_handler.is_authenticated_session
+  original_clear_auth_session = session_handler.clear_auth_session
+  original_get_token_hint = session_handler.get_token_hint
+
+  session_handler.is_authenticated_session = MagicMock(return_value = True)
+  session_handler.clear_auth_session = Mock()
+  session_handler.get_token_hint = MagicMock(return_value = 'valid token hint')
+
+  with client:
+    query_params = {
+      'post_logout_redirect_uri': config.POST_LOGOUT_REDIRECT,
+      'token_hint': 'valid token hint'
+    }
+    encoded_qs = urlencode(query_params)
+    expected_location = '%s?%s' % (config.END_SESSION_ENDPOINT, encoded_qs)
+    local_sut = logout.logout
+    assert local_sut().status_code == 302
+    assert local_sut().location == expected_location
+    
+  
+  session_handler.is_authenticated_session = original_is_authenticated_session
+  session_handler.clear_auth_session = original_clear_auth_session
+  session_handler.get_token_hint = original_get_token_hint
+
+
 sut = session_handler.is_authenticated_session
 
 # class TestIfAuthenticatedSessionExists():
@@ -185,9 +213,11 @@ def test_get_token_hint_should_call_session_get(client):
     session.get.assert_called_once_with('id_token')
 
 def test_get_token_hint_should_return_id_token(client):
+   
    local_sut = session_handler.get_token_hint
    with client.session_transaction() as session:
      session['id_token'] = 'any valid id token'
      print(session.get('id_token'))
      expected = 'any valid id token'
      assert local_sut(session) == expected
+
