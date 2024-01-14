@@ -12,4 +12,5 @@ def clear_auth_session(session: SessionMixin) -> SessionMixin:
   return session
   
 def get_token_hint(session: SessionMixin) -> str:
-  ...
+  token_hint = session.get('id_token')
+  return token_hint

@@ -114,3 +114,10 @@ def test_clear_auth_session_calls_returns_clear_session(client):
 def test_get_token_hint_is_callabe():
    local_sut = session_handler.get_token_hint
    assert callable(local_sut)
+
+def test_get_token_hint_should_return_id_token(client):
+  local_sut = session_handler.get_token_hint
+  with client.session_transaction() as session:
+     session['id_token'] = 'any valid id token'
+     expected = 'any valid id token'
+     assert local_sut(session) == expected
