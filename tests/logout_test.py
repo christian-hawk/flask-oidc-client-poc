@@ -55,15 +55,15 @@ def test_logout_should_clear_auth_session_if_session_is_active(client):
       session_handler.clear_auth_session.assert_called_once()
 
 
-def test_logout_should_return_clear_session(client):
-  session_handler.is_authenticated_session = MagicMock(return_value = True)
+def test_logout_should_NOT_clear_auth_session_if_session_is_inactive(client):
+  session_handler.is_authenticated_session = MagicMock(return_value = False)
   session_handler.clear_auth_session = Mock(return_value = '')
   with client.session_transaction() as session:
       session['id_token'] = 'any valid id_token'
       session['user'] = 'any valid user object'
       sut = logout.logout
       response = sut()
-      session_handler.clear_auth_session.assert_called_once()
+      session_handler.clear_auth_session.assert_not_called()
 
 sut = session_handler.is_authenticated_session
 
