@@ -11,3 +11,5 @@ def clear_auth_session(session: SessionMixin) -> SessionMixin:
   session.pop('id_token')
   return session
   
+def get_token_hint(session: SessionMixin) -> str:
+  ...
