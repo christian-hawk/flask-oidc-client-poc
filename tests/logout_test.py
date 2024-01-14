@@ -2,7 +2,8 @@ from oidc_client import logout, create_app
 from oidc_client.helpers import session_handler
 import pytest
 from flask import Flask, testing
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, Mock
+from oidc_client.logout import session as client_session
 
   # Check if session is active (Credential exists)
   # saves id_token as token_hint
@@ -32,14 +33,37 @@ def app():
 def client(app: Flask) -> testing.FlaskClient :
     return app.test_client()
 
-def test_logout_should_check_if_session_is_active():
-  stored_original_method = session_handler.is_authenticated_session
-  session_handler.is_authenticated_session = MagicMock()
-  sut = logout.logout
-  sut()
-  session_handler.is_authenticated_session.assert_called_once()
-  session_handler.is_authenticated_session = stored_original_method
+def test_logout_should_check_if_session_is_active(client):
+  with client.session_transaction() as session:
+    stored_original_method = session_handler.is_authenticated_session
+    session_handler.clear_auth_session = Mock(return_value = '')
+    session_handler.is_authenticated_session = MagicMock()
+    sut = logout.logout
+    sut()
+    session_handler.is_authenticated_session.assert_called_once()
+    session_handler.is_authenticated_session = stored_original_method
 
+
+def test_logout_should_clear_auth_session_if_session_is_active(client):
+  session_handler.is_authenticated_session = MagicMock(return_value = True)
+  session_handler.clear_auth_session = Mock(return_value = '')
+  with client.session_transaction() as session:
+      session['id_token'] = 'any valid id_token'
+      session['user'] = 'any valid user object'
+      sut = logout.logout
+      sut()
+      session_handler.clear_auth_session.assert_called_once()
+
+
+def test_logout_should_return_clear_session(client):
+  session_handler.is_authenticated_session = MagicMock(return_value = True)
+  session_handler.clear_auth_session = Mock(return_value = '')
+  with client.session_transaction() as session:
+      session['id_token'] = 'any valid id_token'
+      session['user'] = 'any valid user object'
+      sut = logout.logout
+      response = sut()
+      session_handler.clear_auth_session.assert_called_once()
 
 sut = session_handler.is_authenticated_session
 
@@ -59,6 +83,7 @@ def test_is_auth_session_should_return_false_if_authenticated_session(client):
   with client.session_transaction() as session:
      session['id_token'] = 'any valid id_token'
      assert sut(session) is True
+
 
 
 
