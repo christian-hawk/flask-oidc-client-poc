@@ -118,6 +118,13 @@ def test_get_token_hint_is_callabe():
 def test_get_token_hint_should_return_id_token(client):
   local_sut = session_handler.get_token_hint
   with client.session_transaction() as session:
+    session.get = MagicMock()
+    local_sut(session)
+    session.get.assert_called_once_with('id_token')
+
+def test_get_token_hint_should_call_session_get(client):
+   local_sut = session_handler.get_token_hint
+   with client.session_transaction() as session:
      session['id_token'] = 'any valid id token'
      expected = 'any valid id token'
      assert local_sut(session) == expected
