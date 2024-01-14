@@ -109,3 +109,8 @@ def test_clear_auth_session_calls_returns_clear_session(client):
       response = sut2(session)
       assert ('user' not in response)
       assert ('id_token' not in response)
+
+# session handler get token_hint
+def test_get_token_hint_is_callabe():
+   local_sut = session_handler.get_token_hint
+   assert callable(local_sut)
