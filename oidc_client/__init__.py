@@ -1,12 +1,14 @@
 from flask import Flask, render_template, redirect, request, session, url_for, jsonify
 
 from authlib.integrations.flask_client import OAuth
-
+from . import logout
 from . import config as cfg
+
 oauth = OAuth()
 
 
-def create_app():
+
+def create_app() -> Flask :
     app = Flask(__name__)
     app.secret_key = 'dev'
     app.config['OP_CLIENT_ID'] = 'selfservice-oidc-sso'
@@ -22,11 +24,14 @@ def create_app():
         user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:121.0) Gecko/20100101 Firefox/121.0'
     )
 
+    # logout as a bp already
+    app.register_blueprint(logout.bp)
+
     @app.route('/')
     def index():
         return render_template('index.html')
         # display link to protected content
-        ...
+   
 
     @app.route('/login')
     def login():
@@ -65,10 +70,11 @@ def create_app():
                         (request.method, request.query_string))
         token = oauth.op.authorize_access_token()
         app.logger.debug('/callback - token = %s' % token)
+        session['id_token'] = token['id_token']
         user = oauth.op.userinfo()
         app.logger.debug('/callback - user = %s' % user)
         session['user'] = user
-        session['id_token'] = token['userinfo']
+        # session['id_token'] = token['userinfo']
         app.logger.debug('/callback - cookies = %s' % request.cookies)
         app.logger.debug('/callback - session = %s' % session)
 
