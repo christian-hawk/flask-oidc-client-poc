@@ -221,3 +221,12 @@ def test_get_token_hint_should_return_id_token(client):
      expected = 'any valid id token'
      assert local_sut(session) == expected
 
+def test_should_redirect_to_index_if_not_auth(client, app):
+   local_sut = logout.logout
+   with app.test_request_context():
+      with client.session_transaction() as session:
+          session_handler.is_authenticated_session = MagicMock(return_value = False)
+          print(client.get(url_for('index')))
+          assert local_sut().status_code == 302
+          assert local_sut().location == url_for('index')
+      
