@@ -11,21 +11,26 @@ oauth = OAuth()
 def create_app() -> Flask :
     app = Flask(__name__)
     app.secret_key = 'dev'
-    app.config['OP_CLIENT_ID'] = 'selfservice-oidc-sso'
-    app.config['OP_CLIENT_SECRET'] = 'W39evxeKaVDY6lrmQlN72dUZ2iOYPUwyOlesYn4kYRITNmTfGYDu8YiRHqZmMiiu' # cfg.CLIENT_SECRET
+    app.config['OP_CLIENT_ID'] = cfg.CLIENT_ID
+    app.config['OP_CLIENT_SECRET'] = cfg.CLIENT_SECRET
+    
+    server_metadata_url = cfg.SERVER_META_URL
+
     oauth.init_app(app)
     oauth.register(
         'op',
-        server_metadata_url= 'http://localhost:9090/temp-server-metadata', #'https://cert.1stadvantage.org/idp/identity/.well-known/openid-configuration',
+        server_metadata_url= server_metadata_url, ##'http://localhost:9090/temp-server-metadata', 'https://cert.1stadvantage.org/idp/identity/.well-known/openid-configuration',
         client_kwargs={
-            'scope': 'openid core_identity'# cfg.SCOPE
+            'scope': cfg.SCOPE,
+            #'code_challenge_method': 'S256'
         },
         # token_endpoint_auth_method='client_secret_post',# cfg.SERVER_TOKEN_AUTH_METHOD
-        user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:121.0) Gecko/20100101 Firefox/121.0'
+        # user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:121.0) Gecko/20100101 Firefox/121.0'
     )
 
     # logout as a bp already
     app.register_blueprint(logout.bp)
+    # TODO: group endpoints as blueprints
 
     @app.route('/')
     def index():
