@@ -16,12 +16,15 @@ def create_app() -> Flask :
     app.secret_key = 'dev'
 
     app.logger.info('Loading client configuration from file...')
+
     app.config['OP_CLIENT_ID'] = cfg.CLIENT_ID
     app.config['OP_CLIENT_SECRET'] = cfg.CLIENT_SECRET
     
     server_metadata_url = cfg.SERVER_META_URL
+
     app.logger.info('Metadata will be loaded from %s' % server_metadata_url )
     app.logger.info('Config scope value is %s' % cfg.SCOPE)
+
 
     oauth.init_app(app)
     oauth.register(
