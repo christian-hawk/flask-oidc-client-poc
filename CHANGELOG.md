@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.0](https://github.com/christian-hawk/flask-oidc-client-poc/compare/v0.2.0...v0.3.0) (2024-03-02)
+
+
+### Features
+
+* **logging:** setup logging with defaults ([#15](https://github.com/christian-hawk/flask-oidc-client-poc/issues/15)) ([b435920](https://github.com/christian-hawk/flask-oidc-client-poc/commit/b435920ad3da95c99a00cd8d8e200ef639f78346))
+* **settings:** load settings from `config.py` file ([#13](https://github.com/christian-hawk/flask-oidc-client-poc/issues/13)) ([9328d27](https://github.com/christian-hawk/flask-oidc-client-poc/commit/9328d276b34b00d5fca619636a287e9771dd17aa))
+
 ## [0.2.0](https://github.com/christian-hawk/flask-oidc-client-poc/compare/v0.1.0...v0.2.0) (2024-02-02)
 
 
