@@ -4,6 +4,7 @@ from authlib.integrations.flask_client import OAuth
 from . import logout
 from . import config as cfg
 from .helpers.setup_logging import setup_logging
+import secrets
 
 oauth = OAuth()
 
@@ -12,7 +13,7 @@ def create_app() -> Flask :
     setup_logging()
     app = Flask(__name__)
     app.logger.info('Flask app factory called')
-    app.secret_key = 'dev'
+    app.secret_key = secrets.token_hex() 
 
     app.logger.info('Loading client configuration from file...')
 
