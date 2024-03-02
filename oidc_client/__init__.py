@@ -8,7 +8,6 @@ from .helpers.setup_logging import setup_logging
 oauth = OAuth()
 
 
-
 def create_app() -> Flask :
     setup_logging()
     app = Flask(__name__)
@@ -29,18 +28,16 @@ def create_app() -> Flask :
     oauth.init_app(app)
     oauth.register(
         'op',
-        server_metadata_url= server_metadata_url, ##'http://localhost:9090/temp-server-metadata', 'https://cert.1stadvantage.org/idp/identity/.well-known/openid-configuration',
+        server_metadata_url= server_metadata_url, # 'http://localhost:9090/temp-server-metadata'
         client_kwargs={
             'scope': cfg.SCOPE,
-            #'code_challenge_method': 'S256'
+            #'code_challenge_method': 'S256' # used to test with duendesoftware
         },
-        # token_endpoint_auth_method='client_secret_post',# cfg.SERVER_TOKEN_AUTH_METHOD
-        # user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:121.0) Gecko/20100101 Firefox/121.0'
     )
 
     # logout as a bp already
     app.register_blueprint(logout.bp)
-    # TODO: group endpoints as blueprints
+    # TODO: group all endpoints as blueprints
 
     @app.route('/')
     def index():
@@ -82,7 +79,7 @@ def create_app() -> Flask :
         app.logger.info('/callback - received %s - %s' %
                         (request.method, request.query_string))
         # receives callback from OP
-        #try:
+
         if not request.args['code']:
             app.logger.warning('Callback called without code argument, returning 400')
             return {}, 400
@@ -103,7 +100,7 @@ def create_app() -> Flask :
         # except Exception as error:
         #     app.logger.error(str(error))
         #     return {'error': str(error)}, 400
-        ...
+   
 
     @app.route('/temp-server-metadata')
     def temp_server_metadata():
