@@ -3,18 +3,25 @@ from flask import Flask, render_template, redirect, request, session, url_for, j
 from authlib.integrations.flask_client import OAuth
 from . import logout
 from . import config as cfg
+from .helpers.setup_logging import setup_logging
 
 oauth = OAuth()
 
 
 
 def create_app() -> Flask :
+    setup_logging()
     app = Flask(__name__)
+    app.logger.info('Flask app factory called')
     app.secret_key = 'dev'
+
+    app.logger.info('Loading client configuration from file...')
     app.config['OP_CLIENT_ID'] = cfg.CLIENT_ID
     app.config['OP_CLIENT_SECRET'] = cfg.CLIENT_SECRET
     
     server_metadata_url = cfg.SERVER_META_URL
+    app.logger.info('Metadata will be loaded from %s' % server_metadata_url )
+    app.logger.info('Config scope value is %s' % cfg.SCOPE)
 
     oauth.init_app(app)
     oauth.register(
@@ -34,13 +41,14 @@ def create_app() -> Flask :
 
     @app.route('/')
     def index():
+        app.logger.info('index called')
         return render_template('index.html')
-        # display link to protected content
    
 
     @app.route('/login')
     def login():
         # authorize redirect to external login
+        app.logger.info('login called')
         query_args = {
             'redirect_uri': 'https://memberportal-test.1stadvantage.org/callback',
         }
@@ -48,31 +56,35 @@ def create_app() -> Flask :
         app.logger.debug('/login authorize_redirect(redirect_uri) url = %s' %
                          response.location)
         return response
-        ...
 
 
     @app.route('/protected-content')
     def protected_content():
         # shows protected content (user info) to authorized ressource owner
+        app.logger.info('protected_content called')
         app.logger.debug('/protected-content - cookies = %s' % request.cookies)
         app.logger.debug('/protected-content - session = %s' % session)
         if 'user' in session:
             # shows user
+            app.logger.info('user allowed, returning requested content...')
             return session['user']
 
-        # otherwise redirect to login route
+        app.logger.info('session not allowed, redirecting to login...')
         return redirect(url_for('login'))
 
 
     @app.route('/callback')
     def callback():
+        app.logger.info('callback called')
+        app.logger.info('/callback - received %s - %s' %
+                        (request.method, request.query_string))
         # receives callback from OP
         #try:
         if not request.args['code']:
+            app.logger.warning('Callback called without code argument, returning 400')
             return {}, 400
 
-        app.logger.info('/callback - received %s - %s' %
-                        (request.method, request.query_string))
+       
         token = oauth.op.authorize_access_token()
         app.logger.debug('/callback - token = %s' % token)
         session['id_token'] = token['id_token']
