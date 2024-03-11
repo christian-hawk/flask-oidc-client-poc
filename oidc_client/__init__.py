@@ -78,19 +78,34 @@ def create_app() -> Flask :
     def callback():
         # receives callback from OP
         app.logger.info('callback called')
-        app.logger.info('/callback - received %s - %s' %
-                        (request.method, request.query_string))
+        app.logger.info('/callback - received %s - %s', request.method, request.query_string)
 
-        if not request.args['code']:
+        code = request.args.get('code')
+        if not code:
             app.logger.warning('Callback called without code argument, returning 400')
             return {}, 400
 
-       
-        token = oauth.op.authorize_access_token()
-        app.logger.debug('/callback - token = %s' % token)
-        session['id_token'] = token['id_token']
-        user = oauth.op.userinfo()
-        app.logger.debug('/callback - user = %s' % user)
+        try:
+            # if the network connection is lost, or authorization server
+            # doesn't respond, the request will throw an exception
+            token = oauth.op.authorize_access_token()
+        except Exception as e:
+            app.logger.error(f"Error obtaining access token: {e}")
+            return {"error": "Failed to get access token"}, 500
+
+        id_token = token.get('id_token')
+        if not id_token:
+            app.logger.warning("No id_token in response, returning 400")
+            return {}, 400
+        
+        session['id_token'] = id_token
+
+        try:
+            user = oauth.op.userinfo()
+        except Exception as e:
+            app.logger.error(f"Error obtaining user info: {e}")
+            return {"error": "Failed to get user info"}, 500
+        
         session['user'] = user
         app.logger.debug('/callback - cookies = %s' % request.cookies)
         app.logger.debug('/callback - session = %s' % session)
