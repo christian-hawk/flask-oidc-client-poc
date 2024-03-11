@@ -1,14 +1,15 @@
 
 import logging
+import sys
 
 def setup_logging(
-    file: str = 'poc.log', 
     format: str = '[%(asctime)s] %(levelname)s in %(module)s: %(message)s', 
     datefmt: str = '%m/%d/%Y %I:%M:%S %p',
-    level: int = logging.DEBUG) -> None:
+    level: int = logging.DEBUG,
+    handlers: list = [ logging.StreamHandler(sys.stdout) ]) -> None:
   
     logging.basicConfig(
-        filename=file,
         format=format, 
         datefmt=datefmt, 
-        level=level)
+        level=level,
+        handlers=handlers)
