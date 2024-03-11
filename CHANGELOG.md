@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.1](https://github.com/christian-hawk/flask-oidc-client-poc/compare/v0.3.0...v0.3.1) (2024-03-11)
+
+
+### Bug Fixes
+
+* **logs:** send logs to stdout ([09faf9b](https://github.com/christian-hawk/flask-oidc-client-poc/commit/09faf9b1f95d74ad85809bf24520c44a1f004920))
+* **security:** hardcoded secret_key ([b248eff](https://github.com/christian-hawk/flask-oidc-client-poc/commit/b248eff565633e64b084fbba877062309c748ef2))
+
 ## [0.3.0](https://github.com/christian-hawk/flask-oidc-client-poc/compare/v0.2.0...v0.3.0) (2024-03-02)
 
 
