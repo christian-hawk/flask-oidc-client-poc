@@ -76,10 +76,10 @@ def create_app() -> Flask :
 
     @app.route('/callback')
     def callback():
+        # receives callback from OP
         app.logger.info('callback called')
         app.logger.info('/callback - received %s - %s' %
                         (request.method, request.query_string))
-        # receives callback from OP
 
         if not request.args['code']:
             app.logger.warning('Callback called without code argument, returning 400')
@@ -92,15 +92,11 @@ def create_app() -> Flask :
         user = oauth.op.userinfo()
         app.logger.debug('/callback - user = %s' % user)
         session['user'] = user
-        # session['id_token'] = token['userinfo']
         app.logger.debug('/callback - cookies = %s' % request.cookies)
         app.logger.debug('/callback - session = %s' % session)
 
         return redirect('/')
 
-        # except Exception as error:
-        #     app.logger.error(str(error))
-        #     return {'error': str(error)}, 400
    
 
     @app.route('/temp-server-metadata')
