@@ -13,7 +13,7 @@ def create_app() -> Flask :
     setup_logging()
     app = Flask(__name__)
     app.logger.info('Flask app factory called')
-    app.secret_key = secrets.token_hex() 
+    app.secret_key = 'neverUseThisKeyInProductiveEnv'
 
     app.logger.info('Loading client configuration from file...')
 
