@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.4.0](https://github.com/christian-hawk/flask-oidc-client-poc/compare/v0.3.1...v0.4.0) (2024-03-11)
+
+
+### Features
+
+* **compose:** run client and nginx ([99ff66f](https://github.com/christian-hawk/flask-oidc-client-poc/commit/99ff66fff06c4be66241271377a31e3739e2c5ae))
+* **config:** setup production nginx config ([77d0c9d](https://github.com/christian-hawk/flask-oidc-client-poc/commit/77d0c9d590c8d1585efc4a358325c0211adf8911))
+* **Dockerfile:** run gunicorn wsgi ([9b94de3](https://github.com/christian-hawk/flask-oidc-client-poc/commit/9b94de3bc8587bd36a91ad3845ce11e6f44b76ee))
+* **prod-wsgi:** load from app factory ([b32e933](https://github.com/christian-hawk/flask-oidc-client-poc/commit/b32e933361de4682d431020c126c883091f36be0))
+
+
+### Bug Fixes
+
+* **key:** add static key ([033cd8d](https://github.com/christian-hawk/flask-oidc-client-poc/commit/033cd8db345606d190218413cd3e5548360b88e1))
+
+
+### Documentation
+
+* **readme:** add guides ([490d188](https://github.com/christian-hawk/flask-oidc-client-poc/commit/490d188e17d69484cbd0b068cc0249db87680a8d))
+
 ## [0.3.1](https://github.com/christian-hawk/flask-oidc-client-poc/compare/v0.3.0...v0.3.1) (2024-03-11)
 
 
