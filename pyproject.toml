@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "oidc-client"
-version = "0.3.1"
+version = "0.4.0"
 description = ""
 authors = ["christian <eland.christian@gmail.com>"]
 packages = [{include = "oidc_client"}]
