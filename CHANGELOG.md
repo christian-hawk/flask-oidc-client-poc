@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.5.0](https://github.com/christian-hawk/flask-oidc-client-poc/compare/v0.4.0...v0.5.0) (2024-03-11)
+
+
+### Features
+
+* **callback:** add error handling ([#20](https://github.com/christian-hawk/flask-oidc-client-poc/issues/20)) ([8869916](https://github.com/christian-hawk/flask-oidc-client-poc/commit/88699160ec7a5ef1dde8b1554691ee2f52728377))
+
+
+### Bug Fixes
+
+* **callback:** add missing error handling code ([#22](https://github.com/christian-hawk/flask-oidc-client-poc/issues/22)) ([ccfe8d8](https://github.com/christian-hawk/flask-oidc-client-poc/commit/ccfe8d89f45b0dd268912cbe1651cd89555e7175))
+
 ## [0.4.0](https://github.com/christian-hawk/flask-oidc-client-poc/compare/v0.3.1...v0.4.0) (2024-03-11)
 
 
