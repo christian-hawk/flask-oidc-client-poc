@@ -8,7 +8,7 @@ SERVER_META_URL = 'https://cert.1stadvantage.org/idp/identity/.well-known/openid
 CLIENT_ID = 'selfservice-oidc-sso'
 
 # registered OIDC client secret
-CLIENT_SECRET = 'W39evxeKaVDY6lrmQlN72dUZ2iOYPUwyOlesYn4kYRITNmTfGYDu8YiRHqZmMiiu'
+CLIENT_SECRET = 'TEST CLIENT SECRET'
 
 # scopes
 SCOPE = 'openid core_identity'
